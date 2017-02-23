@@ -2,12 +2,9 @@ package com.hueemulator.emulator;
 
 import java.io.IOException;
 
-import com.hueemulator.emulator.Controller;
-import com.hueemulator.emulator.Emulator;
-import com.hueemulator.emulator.Model;
 import com.hueemulator.gui.View;
 import com.hueemulator.server.Server;
-
+import org.springframework.util.SocketUtils;
 
 
 public class TestEmulator {
@@ -15,18 +12,47 @@ public class TestEmulator {
     private Emulator emulator;
     private Model model;
     private Controller controller;
-    String fileName = "/config-3bulbs.json";
+
+    final private String fileName = "/config-3bulbs.json";
     
     private boolean isServerRunning=false;
     
-    public static final String PORT_NUMBER="8888"; 
-    String baseURL = "http://localhost:" + PORT_NUMBER + "/api/";
-    
+    public static final int DEFAULT_PORT_NUMBER = 8888;
+
+    private final int emulatorPort;
+
+    public TestEmulator(int port) {
+        emulatorPort = port;
+    }
+
+    public int getEmulatorPort() {
+        return emulatorPort;
+    }
+
+    /**
+     * @return The base url on wihch this emulator can be reached.
+     */
+    public String getBaseUrl() {
+        return String.format("http://localhost:%d/api/", emulatorPort);
+    }
+
+    /**
+     * @return emulator instance on default port (8888)
+     */
     public static TestEmulator getInstance() {
         if (instance == null) {
-            instance = new TestEmulator();
+            instance = new TestEmulator(DEFAULT_PORT_NUMBER);
         }
         return instance;
+    }
+
+    /**
+     * @return emulator on random available port (>=8001).
+     *         use {@link #getEmulatorPort()} to find out port on which emulator is started.
+     */
+    public static TestEmulator getInstanceOnRandomPort() {
+        int availableTcpPort = SocketUtils.findAvailableTcpPort(8001);
+        return new TestEmulator(availableTcpPort);
     }
     
     public  void startEmulator(boolean headless) throws IOException {
@@ -49,7 +75,7 @@ public class TestEmulator {
    
         try {        
             isServerRunning=true;
-            emulator.setServer(new Server(model.getBridgeConfiguration(), controller, PORT_NUMBER));
+            emulator.setServer(new Server(model.getBridgeConfiguration(), controller, String.valueOf(emulatorPort)));
         } catch (java.net.BindException e) {
             System.out.println(" **NOT STARTED **  Server already running.    " + e.getMessage());            
         }   
@@ -57,6 +83,15 @@ public class TestEmulator {
        if (emulator.getServer() != null) {   //   setUp is started before each test.    
             System.out.println("Starting JUnit Test Emulator...");    
             emulator.getServer().getHttpServer().start();
+        }
+    }
+
+    public void stopEmulator() {
+        if (isServerRunning) {
+            System.out.println("Stopping emulator.");
+            emulator.getServer().getHttpServer().stop(0);
+        } else {
+            System.out.println("Emulator not running.");
         }
     }
 

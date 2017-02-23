@@ -1,40 +1,15 @@
 package com.hueemulator.server.handlers;
 
-import java.io.IOException;
-
-import junit.framework.TestCase;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import com.hueemulator.emulator.HttpTester;
-import com.hueemulator.emulator.TestEmulator;
 import com.hueemulator.lighting.utils.TestUtils;
 import com.hueemulator.model.PHBridgeConfiguration;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
-public class TestSchedulesAPI extends TestCase {
+public class TestSchedulesAPI extends TestBase {
 
-    TestEmulator testEmulator;
-    HttpTester httpTester;
-
-    String fileName = "/config-2bulbs.json";
-    String baseURL = "http://localhost:" + TestEmulator.PORT_NUMBER + "/api/";
-
-    @Before           
-    public void setUp() throws IOException {
-        testEmulator = TestEmulator.getInstance();
-        // Only start the Emulator/Server once for all tests.
-        if (!testEmulator.isServerRunning()) {
-           testEmulator.startEmulator(true);
-        }
-
-        httpTester = new HttpTester();
-        
-        // Tests should be stateless.  Reload initial config before running each test.
-        testEmulator.reloadInitialConfig();
-    }
-    
     @Test
     public void testSchedulesAPI_3_1() throws Exception{
         // 3.1 Get all Schedules

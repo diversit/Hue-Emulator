@@ -12,28 +12,12 @@ import com.hueemulator.emulator.TestEmulator;
 import com.hueemulator.lighting.utils.TestUtils;
 import com.hueemulator.utils.Utils;
 
-public class TestConfigurationAPI extends TestCase {
-    TestEmulator testEmulator;
-    HttpTester httpTester;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-    String fileName = "/config-2bulbs.json";
-    String baseURL = "http://localhost:" + TestEmulator.PORT_NUMBER + "/api/";
+public class TestConfigurationAPI extends TestBase {
 
-
-    @Before           
-    public void setUp() throws IOException {
-        testEmulator = TestEmulator.getInstance();
-        // Only start the Emulator/Server once for all tests.
-        if (!testEmulator.isServerRunning()) {
-           testEmulator.startEmulator(true);
-        }
-
-        httpTester = new HttpTester();
-        
-        // Tests should be stateless.  Reload initial config before running each test.
-        testEmulator.reloadInitialConfig();
-    }
-    
+    @Test
     public void testBadJSON() throws Exception {
         String jsonToPut = "{badJson here . . \"lights\": [\"1\",\"2\"],\"name\": \"Test Group\"}";
         String response="";
