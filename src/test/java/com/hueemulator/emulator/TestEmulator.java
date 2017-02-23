@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.hueemulator.emulator.Controller;
 import com.hueemulator.emulator.Emulator;
 import com.hueemulator.emulator.Model;
+import com.hueemulator.gui.View;
 import com.hueemulator.server.Server;
 
 
@@ -28,15 +29,21 @@ public class TestEmulator {
         return instance;
     }
     
-   
-    
-    public  void startEmulator() throws IOException {
+    public  void startEmulator(boolean headless) throws IOException {
         if (controller!=null) return;
 
         model = new Model();
-        controller = new Controller(model, null, null);
-        emulator = new Emulator(controller, null);
 
+        View view = headless ? null : new View();
+
+        controller = new Controller(model, view, null);
+
+        if (!headless) {
+            view.getMenuBar().setController(controller);
+            view.getGraphicsPanel().setController(controller);
+        }
+
+        emulator = new Emulator(controller, null);
         emulator.loadConfiguration(fileName);
         setModel(model);
    

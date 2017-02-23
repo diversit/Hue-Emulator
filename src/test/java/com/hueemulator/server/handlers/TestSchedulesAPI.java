@@ -26,7 +26,7 @@ public class TestSchedulesAPI extends TestCase {
         testEmulator = TestEmulator.getInstance();
         // Only start the Emulator/Server once for all tests.
         if (!testEmulator.isServerRunning()) {
-           testEmulator.startEmulator();
+           testEmulator.startEmulator(true);
         }
 
         httpTester = new HttpTester();
