@@ -23,3 +23,17 @@ crossPaths := false
 // This forbids including Scala related libraries into the dependency
 autoScalaLibrary := false
 
+// Disable generating javadoc with publishing artifact since javadoc is invalid (not my fault!!)
+publishArtifact in (Compile, packageDoc) := false
+
+// enable publishing the jar produced by `test:package`
+publishArtifact in (Test, packageBin) := true
+
+// enable publishing the test API jar
+publishArtifact in (Test, packageDoc) := false
+
+// enable publishing the test sources jar
+publishArtifact in (Test, packageSrc) := true
+
+// publish to maven repo just like Maven would (use `publish` task, not `publishLocal`)
+publishTo := Some(Resolver.file("file",  new File(Path.userHome.absolutePath+"/.m2/repository")))
