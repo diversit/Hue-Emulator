@@ -7,6 +7,7 @@
     <groupId>eu.diversit.hue</groupId>
     <artifactId>hue-emulator</artifactId>
     <version>0.8-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
@@ -30,6 +31,19 @@
 
     <build>
         <plugins>
+            <plugin>
+                <!-- without this plugin the test-jar is empty -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>

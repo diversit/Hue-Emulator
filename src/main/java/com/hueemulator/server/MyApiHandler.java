@@ -104,7 +104,13 @@ class MyApiHandler implements HttpHandler {
             }
 
             // Check the json is valid, if not return the same response as the bridge.
-            boolean isValidJSON = Utils.isJSONValid(jSONString);
+            // only check if not post to discover new lights (that contain may be empty)
+            final boolean isValidJSON;
+            if (!(requestMethod.equalsIgnoreCase("POST") && url.matches("\\/api\\/[a-zA-Z0-9]+\\/lights\\/"))) {
+                isValidJSON = Utils.isJSONValid(jSONString);
+            } else {
+                isValidJSON = true;
+            }
             
             if (!isValidJSON) {     
                 configurationAPIhandler.returnErrorResponse("2", "body contains invalid json", url, responseBody);
@@ -166,6 +172,11 @@ class MyApiHandler implements HttpHandler {
         }
         else if (lastURLElement.equals("api")) {
             configurationAPIhandler.createUser_7_1(mapper, jSONString, bridgeConfiguration, responseBody, controller);
+        } else if (lastURLElement.equals("lights")) {
+            // Fake searching for lights
+            // Ignoring: filtering on serial (see https://developers.meethue.com/documentation/lights-api#13_search_for_new_lights)
+            responseBody.write("[ { \"success\": { \"/lights\": \"Searching for new devices\" } } ]".getBytes());
+            responseBody.close();
         }
 
     }
@@ -181,7 +192,15 @@ class MyApiHandler implements HttpHandler {
         }
         else if (urlElements[noURLEelements-2].equals("lights")) {
             String light=urlElements[noURLEelements-1];
-            lightsAPIhandler.getLightAttributes_1_4(mapper, bridgeConfiguration, responseBody, controller, light);
+            if ("new".equals(light)) {
+                // on '../lights/new' it should return all lights (found since last search, but we'll return all lights in the emulator)
+                // see https://developers.meethue.com/documentation/lights-api#12_get_new_lights
+                lightsAPIhandler.getAllLights_1_1(mapper, bridgeConfiguration, responseBody, controller);
+            } else {
+                // get attributes of a single light
+                // see https://developers.meethue.com/documentation/lights-api#14_get_light_attributes_and_state
+                lightsAPIhandler.getLightAttributes_1_4(mapper, bridgeConfiguration, responseBody, controller, light);
+            }
         }
         else if (lastURLElement.equals("groups")) {
             groupsAPIhandler.getAllGroups_2_1(mapper, bridgeConfiguration, responseBody, controller);

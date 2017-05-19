@@ -194,6 +194,16 @@ public class LightsAPI {
         if (jObject != null) {
             JSONArray names = jObject.names();
 
+            // If the json contains the 'on' property, this should be set first otherwise other values, like for color, are ignored
+            if (names.getArray().contains("on")) {
+                ArrayList nameList = names.getArray();
+                nameList.remove("on");
+                ArrayList newList = new ArrayList();
+                newList.add("on");
+                newList.addAll(nameList);
+                names = new JSONArray(newList);
+            }
+
             for (int i=0; i<names.length(); i++) {
                 JSONObject successObject = new JSONObject();
 
